@@ -1,0 +1,123 @@
+---
+import utterances from "../data/utterances.json";
+// Order utterances by member utterance_count
+const sortedUtterances = Object.keys(utterances).map((key) => {
+  utterances[key]["utterances"].sort(
+    (a, b) =>
+      a["member"]["party"].localeCompare(b["member"]["party"]) ||
+      b["utterance_count"] - a["utterance_count"]
+  );
+  return utterances[key];
+});
+
+const partyColoursRGBA = {
+  DA: "rgba(0, 0, 255, 0.25)",
+  ANC: "rgba(255, 0, 0, 0.25)",
+  EFF: "rgba(255, 255, 0, 0.25)",
+  "FF+": "rgba(0, 255, 0, 0.25)",
+  COPE: "rgba(255, 0, 255, 0.25)",
+  NFP: "rgba(0, 255, 255, 0.25)",
+  ACDP: "rgba(155, 155, 155, 0.25)",
+};
+---
+
+<style>
+  html,
+  body {
+    font-family: Roboto, sans-serif;
+    margin: 1em;
+    padding: 0;
+    background-color: #f5f5f5;
+    box-sizing: border-box;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+    border-bottom: solid 1px #ccc;
+  }
+  li {
+    margin-bottom: 10px;
+    display: inline-block;
+    text-align: center;
+    border-radius: 10px;
+    width: 50px;
+    height: 50px;
+    font-weight: bold;
+    position: relative;
+  }
+  h2 {
+    margin-bottom: 20px;
+  }
+  .party-circle {
+    border-radius: 100%;
+    background-color: rgba(0, 0, 255, 0.25);
+    margin-right: 10px;
+    text-align: center;
+    container-type: size;
+    vertical-align: middle;
+    overflow: hidden;
+    margin: 0 auto;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    border: solid 2px white;
+    pointer-events: none;
+  }
+
+  li:hover {
+    cursor: pointer;
+  }
+
+  li:hover .party-circle {
+    border: solid 20px red;
+  }
+
+  .avatar {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 100%;
+    height: 25px;
+    width: 25px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    overflow: hidden;
+  }
+</style>
+<div>
+  {
+    Object.keys(utterances).map((key) => (
+      <div>
+        <h2>Meeting: {utterances[key]["meeting_title"]}</h2>
+        <ul>
+          {utterances[key]["utterances"].map((utterance) => (
+            <li>
+              <div
+                class="party-circle"
+                style={{
+                  width: utterance["utterance_count"] + ".9vw",
+                  height: utterance["utterance_count"] + ".9vw",
+                  lineHeight: utterance["utterance_count"] + ".9vw",
+                  backgroundColor:
+                    partyColoursRGBA[utterance["member"]["party"]],
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "50cqw",
+                  }}
+                />
+              </div>
+              <div class="avatar">
+                <img
+                  src={`https://i.pravatar.cc/25?u=${utterance["member"]["id"]}`}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>
