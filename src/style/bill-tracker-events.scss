@@ -1,0 +1,89 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family: Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+}
+
+body {
+  margin: 1em;
+}
+
+table {
+  border-spacing: 0;
+
+  tr {
+    td {
+      padding: 0.25em;
+      line-height: 2em;
+      overflow: hidden;
+    }
+  }
+}
+
+.spacer {
+  background-color: #ddd;
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  display: inline-block;
+  min-width: 1em;
+
+  &:hover {
+    z-index: 1;
+    border: solid 2px rgba(255, 255, 255, 0.5);
+    background-color: #ccc;
+  }
+
+  &.spacer-0 {
+    display: none;
+  }
+}
+
+.event {
+  border-radius: 0.5em;
+  width: 1em;
+  height: 1em;
+  font-weight: bold;
+  background-color: #ddd;
+  display: inline-block;
+  color: #fff;
+  position: relative;
+
+  &:hover {
+    z-index: 1;
+    scale: 2;
+    border: solid 2px rgba(255, 255, 255, 0.5);
+    opacity: 0.8;
+  }
+
+  &.event-house-joint {
+    background-color: #ffff00;
+  }
+
+  &.event-house-na {
+    background-color: #0074d9;
+  }
+
+  &.event-house-ncop {
+    background-color: #2ecb41;
+  }
+
+  &.event-house-president {
+    background-color: #ff851c;
+  }
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.no-underline {
+  text-decoration: none;
+  color: #333;
+}

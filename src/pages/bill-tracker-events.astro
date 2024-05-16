@@ -1,0 +1,73 @@
+---
+import Layout from "../layouts/Layout.astro";
+import data from "../data/bill-tracker.json";
+import "../style/bill-tracker-events.scss";
+
+// Sort bills by year
+data.sort((a, b) => {
+  return a.year - b.year;
+});
+
+// Add last house to events based on previous house if not present
+data.forEach((bill) => {
+  bill.events.forEach((event, index) => {
+    if (!event.house) {
+      event.house = bill.events.slice(0, index).reduce((house, event) => {
+        return event.house || house;
+      }, null);
+    }
+  });
+});
+
+// Add days since last event
+data.forEach((bill) => {
+  bill.events.forEach((event, index) => {
+    if (index > 0) {
+      const previousEvent = bill.events[index - 1];
+      event.daysSinceLastEvent = Math.round(
+        (new Date(event.date) - new Date(previousEvent.date)) /
+          (1000 * 60 * 60 * 24)
+      );
+    }
+  });
+});
+---
+
+<Layout title="Bill Tracker">
+  <table>
+    {
+      data.map((bill, index) => (
+        <tr class="bill">
+          <td class="no-wrap" align="right">
+            <a
+              class="no-underline"
+              href={`https://pmg.org.za/bill/${bill.id}/`}
+              target="_blank"
+            >
+              {bill.title} ({bill.year})
+            </a>
+          </td>
+          <td class="no-wrap">
+            {bill.events.map((event) => (
+              <>
+                <div
+                  class={`event event-house-${event.house
+                    ?.replace("'", " ")
+                    .toLowerCase()
+                    .split(" ")
+                    .join("_")}`}
+                  title={`(${event.house}) ${event.title}: ${event.date}`}
+                />
+                <div
+                  class={`spacer spacer-${event.daysSinceLastEvent}`}
+                  style={{ width: `${event.daysSinceLastEvent / 2}px` }}
+                  title={`${event.daysSinceLastEvent} days since last event`}
+                />
+              </>
+            ))}
+          </td>
+        </tr>
+      ))
+    }
+  </table>
+</Layout>
