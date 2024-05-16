@@ -1,123 +1,148 @@
 ---
-import utterances from "../data/utterances.json";
-// Order utterances by member utterance_count
-const sortedUtterances = Object.keys(utterances).map((key) => {
-  utterances[key]["utterances"].sort(
-    (a, b) =>
-      a["member"]["party"].localeCompare(b["member"]["party"]) ||
-      b["utterance_count"] - a["utterance_count"]
+import Layout from "../layouts/Layout.astro";
+import "../style/main.scss";
+import fs from "fs";
+import { parse } from "csv-parse";
+
+const fileData = fs.readFileSync("./src/data/utterances-by-party.csv", "utf8");
+const data = await new Promise((resolve, reject) => {
+  parse(
+    fileData,
+    {
+      columns: false,
+      skip_empty_lines: true,
+      cast: true,
+      from_line: 2,
+    },
+    (err, output) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(output);
+      }
+    }
   );
-  return utterances[key];
 });
 
-const partyColoursRGBA = {
-  DA: "rgba(0, 0, 255, 0.25)",
-  ANC: "rgba(255, 0, 0, 0.25)",
-  EFF: "rgba(255, 255, 0, 0.25)",
-  "FF+": "rgba(0, 255, 0, 0.25)",
-  COPE: "rgba(255, 0, 255, 0.25)",
-  NFP: "rgba(0, 255, 255, 0.25)",
-  ACDP: "rgba(155, 155, 155, 0.25)",
+// Group data array into object by second column
+const groupedData = {};
+data.forEach((row) => {
+  if (!groupedData[row[1]]) {
+    groupedData[row[1]] = {};
+  }
+  groupedData[row[1]][row[0]] = {
+    full_name: row[0],
+    party: row[1],
+    utterance_count: row[2],
+    pa_url: row[3],
+    profile_pic_url: row[4],
+  };
+});
+
+// Array from data sorted by party with most keys and then utterance count
+const utterances = Object.keys(groupedData)
+  .sort((a, b) => {
+    return (
+      Object.keys(groupedData[b]).length - Object.keys(groupedData[a]).length
+    );
+  })
+  .reduce((obj, key) => {
+    obj[key] = groupedData[key];
+    return obj;
+  }, {});
+
+// Find max utterance count
+const maxUtteranceCount = Object.keys(utterances).reduce((max, party_key) => {
+  const partyMax = Object.keys(utterances[party_key]).reduce(
+    (max, member_key) => {
+      return Math.max(
+        max,
+        parseInt(utterances[party_key][member_key]["utterance_count"])
+      );
+    },
+    0
+  );
+  return Math.max(max, partyMax);
+}, 0);
+
+const partyColourOpacity = 0.2;
+const partyColoursRGB = {
+  ANC: `255, 203, 3`,
+  DA: `0, 92, 167`,
+  EFF: `217, 0, 0`,
+  IFP: `255, 155, 155`,
+  ACDP: `155, 155, 155`,
+  NFP: `0, 255, 255`,
+  UDM: `155, 255, 155`,
+  COPE: `255, 0, 255`,
+  "FF+": `0, 255, 0`,
+  "AGANG SA": `255, 155, 0`,
+  AIC: `255, 155, 255`,
+  APC: `155, 255, 255`,
+  "Al Jama-ah": `255, 255, 155`,
+  ATM: `255, 255, 155`,
+  GOOD: `155, 255, 255`,
+  PAC: `255, 155, 255`,
+  "Minority Front (MF)": `255, 255, 155`,
+};
+
+const partyColourRGBA = (rgb: string) => {
+  return `rgba(${rgb}, ${partyColourOpacity})`;
+};
+
+// Function to scale utterance count between 1 and 50
+const calcVH = (utteranceCount: number) => {
+  const x = 4 + ((utteranceCount - 1) / (maxUtteranceCount - 1)) * (30 - 2);
+  return Math.round(x * 100) / 100;
 };
 ---
 
-<style>
-  html,
-  body {
-    font-family: Roboto, sans-serif;
-    margin: 1em;
-    padding: 0;
-    background-color: #f5f5f5;
-    box-sizing: border-box;
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-    border-bottom: solid 1px #ccc;
-  }
-  li {
-    margin-bottom: 10px;
-    display: inline-block;
-    text-align: center;
-    border-radius: 10px;
-    width: 50px;
-    height: 50px;
-    font-weight: bold;
-    position: relative;
-  }
-  h2 {
-    margin-bottom: 20px;
-  }
-  .party-circle {
-    border-radius: 100%;
-    background-color: rgba(0, 0, 255, 0.25);
-    margin-right: 10px;
-    text-align: center;
-    container-type: size;
-    vertical-align: middle;
-    overflow: hidden;
-    margin: 0 auto;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 50%;
-    border: solid 2px white;
-    pointer-events: none;
-  }
-
-  li:hover {
-    cursor: pointer;
-  }
-
-  li:hover .party-circle {
-    border: solid 20px red;
-  }
-
-  .avatar {
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 100%;
-    height: 25px;
-    width: 25px;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 50%;
-    overflow: hidden;
-  }
-</style>
-<div>
+<Layout title="Voices of the 6th Parliament">
   {
-    Object.keys(utterances).map((key) => (
-      <div>
-        <h2>Meeting: {utterances[key]["meeting_title"]}</h2>
+    Object.keys(utterances).map((party_key) => (
+      <div class="item">
+        <h2>{party_key}</h2>
         <ul>
-          {utterances[key]["utterances"].map((utterance) => (
-            <li>
-              <div
-                class="party-circle"
-                style={{
-                  width: utterance["utterance_count"] + ".9vw",
-                  height: utterance["utterance_count"] + ".9vw",
-                  lineHeight: utterance["utterance_count"] + ".9vw",
-                  backgroundColor:
-                    partyColoursRGBA[utterance["member"]["party"]],
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "50cqw",
-                  }}
-                />
-              </div>
-              <div class="avatar">
-                <img
-                  src={`https://i.pravatar.cc/25?u=${utterance["member"]["id"]}`}
-                />
-              </div>
-            </li>
-          ))}
+          {Object.keys(utterances[party_key])
+            .sort((a, b) => {
+              return (
+                utterances[party_key][b]["utterance_count"] -
+                utterances[party_key][a]["utterance_count"]
+              );
+            })
+            .map((member_key) => {
+              let member = utterances[party_key][member_key];
+              return (
+                <li
+                  title={`${member["full_name"]} (${member["party"]}): ${member["utterance_count"]} utterances`}
+                >
+                  <div
+                    class="party-circle"
+                    style={{
+                      width: calcVH(member["utterance_count"]) + "vh",
+                      height: calcVH(member["utterance_count"]) + "vh",
+                      lineHeight: calcVH(member["utterance_count"]) + "vh",
+                      backgroundColor: partyColourRGBA(
+                        partyColoursRGB[party_key]
+                      ),
+                    }}
+                  />
+                  <a
+                    href={member["pa_url"]}
+                    target="_blank"
+                    class={`avatar utterances-${member["utterance_count"]}`}
+                    style={{
+                      backgroundImage: `url(${member["profile_pic_url"]})`,
+                    }}
+                  >
+                    {member["full_name"]} ({member["party"]}):{" "}
+                    {member["utterance_count"]} utterances
+                  </a>
+                </li>
+              );
+            })}
         </ul>
       </div>
     ))
   }
-</div>
+</Layout>

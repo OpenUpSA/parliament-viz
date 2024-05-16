@@ -1,0 +1,107 @@
+---
+import Layout from "../layouts/Layout.astro";
+import data from "../data/utterances-by-party.json";
+import "../style/main.scss";
+
+// Array from data sorted by party with most keys
+const utterances = Object.keys(data)
+  .sort((a, b) => Object.keys(data[b]).length - Object.keys(data[a]).length)
+  .reduce((acc, key) => {
+    acc[key] = data[key];
+    return acc;
+  }, {});
+
+// Find max utterance count
+const maxUtteranceCount = Object.values(utterances).reduce(
+  (max, party) =>
+    Math.max(
+      max,
+      Object.values(party).reduce(
+        (max, member) => Math.max(max, member["utterance_count"]),
+        0
+      )
+    ),
+  0
+);
+
+const partyColourOpacity = 0.2;
+const partyColoursRGB = {
+  ANC: `255, 203, 3`,
+  DA: `0, 92, 167`,
+  EFF: `217, 0, 0`,
+  IFP: `255, 155, 155`,
+  ACDP: `155, 155, 155`,
+  NFP: `0, 255, 255`,
+  UDM: `155, 255, 155`,
+  COPE: `255, 0, 255`,
+  "FF+": `0, 255, 0`,
+  "AGANG SA": `255, 155, 0`,
+  AIC: `255, 155, 255`,
+  APC: `155, 255, 255`,
+  "Al Jama-ah": `255, 255, 155`,
+  ATM: `255, 255, 155`,
+  GOOD: `155, 255, 255`,
+  PAC: `255, 155, 255`,
+  "Minority Front (MF)": `255, 255, 155`,
+};
+
+const partyColourRGBA = (rgb: string) => {
+  return `rgba(${rgb}, ${partyColourOpacity})`;
+};
+
+// Function to scale utterance count between 1 and 50
+const calcVH = (utteranceCount: number) => {
+  const x = 4 + ((utteranceCount - 1) / (maxUtteranceCount - 1)) * (30 - 2);
+  return Math.round(x * 100) / 100;
+};
+---
+
+<Layout title="Voices of the 6th Parliament">
+  {
+    Object.keys(utterances).map((party_key) => (
+      <div class="item">
+        <h2>{party_key}</h2>
+        <ul>
+          {Object.keys(utterances[party_key])
+            .sort((a, b) => {
+              return (
+                utterances[party_key][b]["utterance_count"] -
+                utterances[party_key][a]["utterance_count"]
+              );
+            })
+            .map((member_key) => {
+              let member = utterances[party_key][member_key];
+              return (
+                <li
+                  title={`${member["full_name"]} (${member["party"]}): ${member["utterance_count"]} utterances`}
+                >
+                  <div
+                    class="party-circle"
+                    style={{
+                      width: calcVH(member["utterance_count"]) + "vh",
+                      height: calcVH(member["utterance_count"]) + "vh",
+                      lineHeight: calcVH(member["utterance_count"]) + "vh",
+                      backgroundColor: partyColourRGBA(
+                        partyColoursRGB[party_key]
+                      ),
+                    }}
+                  ></div>
+                  <a
+                    href={member["pa_url"]}
+                    target="_blank"
+                    class={`avatar utterances-${member["utterance_count"]}`}
+                    style={{
+                      backgroundImage: `url(https://static.pmg.org.za/${member["profile_pic_url"]})`,
+                    }}
+                  >
+                    {member["full_name"]} ({member["party"]}):{" "}
+                    {member["utterance_count"]} utterances
+                  </a>
+                </li>
+              );
+            })}
+        </ul>
+      </div>
+    ))
+  }
+</Layout>
