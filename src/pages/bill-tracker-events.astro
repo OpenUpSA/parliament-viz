@@ -31,43 +31,91 @@ data.forEach((bill) => {
     }
   });
 });
+
+const billStatus = {
+  lapsed: { short: "Lapsed", description: "Lapsed" },
+  withdrawn: { short: "Withdrawn", description: "Withdrawn" },
+  na: {
+    short: "NA Consideration",
+    description: "Under consideration by the National Assembly.",
+  },
+  ncop: {
+    short: "NCOP Consideration",
+    description: "Under consideration by the National Council of Provinces.",
+  },
+  enacted: {
+    short: "Enacted",
+    description: "The bill has been signed into law.",
+  },
+  "act-commenced": { short: "Act Commenced", description: "Act commenced" },
+  "act-partly-commenced": {
+    short: "Act Partly Commenced",
+    description: "Act partially commenced",
+  },
+  president: {
+    short: "Approved",
+    description: "Approved by Parliament. Waiting to be signed into law.",
+  },
+  rejected: { short: "Rejected", description: "Rejected" },
+  draft: { short: "Drafted", description: "Drafted" },
+};
+
+const eventUrl = (event, bill) => {
+  switch (event.type) {
+    case "bill-introduced":
+      return `https://pmg.org.za/bill/${bill.id}/`;
+    case "bill-passed":
+      return `https://pmg.org.za/hansard/${event.id}/`;
+    case "bill-signed":
+      return `https://pmg.org.za/bill/${bill.id}/`;
+    case "bill-act-commenced":
+      return `https://pmg.org.za/bill/${bill.id}/`;
+    case "bill-enacted":
+      return `https://pmg.org.za/bill/${bill.id}/`;
+    case "bill-updated":
+      return `https://pmg.org.za/bill/${bill.id}/`;
+    case "committee-meeting":
+      return `https://pmg.org.za/committee-meeting/${event.id}/`;
+    case "media-briefing":
+      return `https://pmg.org.za/bill/${bill.id}/`;
+    case "plenary":
+      return `https://pmg.org.za/hansard/${event.id}/`;
+    default:
+      return `https://pmg.org.za/${event.type}/${event.id}/`;
+  }
+};
 ---
 
 <Layout title="Bill Tracker">
-  <table>
-    {
-      data.map((bill, index) => (
-        <tr class="bill">
-          <td class="no-wrap" align="right">
+  {
+    data.map((bill, index) => (
+      <div class="bill">
+        {bill.events.map((event, index) => (
+          <>
+            {index != 0 && (
+              <div
+                class={`spacer spacer-${event.daysSinceLastEvent} event-house-${event.house}`}
+                style={{ width: `${event.daysSinceLastEvent}px` }}
+                title={`${event.daysSinceLastEvent} days since last event`}
+              />
+            )}
             <a
-              class="no-underline"
-              href={`https://pmg.org.za/bill/${bill.id}/`}
+              href={eventUrl(event, bill)}
               target="_blank"
-            >
-              {bill.title} ({bill.year})
-            </a>
-          </td>
-          <td class="no-wrap">
-            {bill.events.map((event) => (
-              <>
-                <div
-                  class={`event event-house-${event.house
-                    ?.replace("'", " ")
-                    .toLowerCase()
-                    .split(" ")
-                    .join("_")}`}
-                  title={`(${event.house}) ${event.title}: ${event.date}`}
-                />
-                <div
-                  class={`spacer spacer-${event.daysSinceLastEvent}`}
-                  style={{ width: `${event.daysSinceLastEvent / 2}px` }}
-                  title={`${event.daysSinceLastEvent} days since last event`}
-                />
-              </>
-            ))}
-          </td>
-        </tr>
-      ))
-    }
-  </table>
+              class={`event event-house-${event.house}`}
+              title={`(${event.house}) ${event.type}: ${event.title} - ${new Date(event.date).toLocaleDateString()}`}
+            />
+          </>
+        ))}
+        <a
+          href={`https://pmg.org.za/bill/${bill.id}/`}
+          target="_blank"
+          class={`bill-status bill-status-${bill.status} event-count-${bill.events.length}`}
+          title={billStatus[bill.status]["description"]}
+        >
+          {billStatus[bill.status]["short"]}
+        </a>
+      </div>
+    ))
+  }
 </Layout>

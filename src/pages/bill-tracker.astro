@@ -34,39 +34,21 @@ data.forEach((bill) => {
 ---
 
 <Layout title="Bill Tracker">
-  <table>
+  <div>
     {
       data.map((bill, index) => (
-        <tr class="bill" key={bill.id}>
-          <td class="no-wrap" align="right">
-            <a class="no-underline" href={`https://pmg.org.za/bill/${bill.id}/`} target="_blank">
-              {bill.title} ({bill.year})
-            </a>
-          </td>
-          <td>
-            <ul>
-              {bill.events.map((event, index) => (
-                <li
-                  class={`event event-house-${event.house
-                    ?.replace("'", " ")
-                    .toLowerCase()
-                    .split(" ")
-                    .join("_")}`}
-                  key={event.id}
-                >
-                  <a
-                    href={`https://pmg.org.za/bill/${bill.id}/`}
-                    target="_blank"
-                    style={{ width: `${event.daysSinceLastEvent}px` }}
-                    title={`(${event.house}) ${event.title}: ${event.date}`}
-                  />
-                </li>
-              ))}
-            </ul>
-          </td>
-        </tr>
+        <div class={`bill event-count-${bill.events.length}`}>
+          {bill.events.map((event, index) => (
+            <a
+              href={`https://pmg.org.za/bill/${bill.id}/`}
+              target="_blank"
+              style={{ width: `${event.daysSinceLastEvent}px` }}
+              title={`(${event.house}) ${event.title}: ${event.date}`}
+              class={`event event-house-${event.house} ${bill.events[index - 1]?.house != event.house ? "previous-not-same-house" : ""} ${bill.events[index + 1]?.house != event.house ? "next-not-same-house" : ""}`}
+            />
+          ))}
+        </div>
       ))
     }
-  </table>
-  }
+  </div>
 </Layout>
