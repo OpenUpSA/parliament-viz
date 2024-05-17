@@ -12,21 +12,19 @@ body {
 }
 
 body {
-  margin: 40px;
-
-  div {
-    &.event-count-0 {
-      display: none;
-    }
-  }
+  margin: 1vw;
 }
 
 .bill {
   white-space: nowrap;
   margin: 1px;
 
+  &.event-count-0 {
+    display: none;
+  }
+
   .event {
-    min-width: 10px;
+    min-width: 0.5vw;
     height: 5px;
     font-weight: bold;
     background-color: #ccc;
@@ -73,31 +71,17 @@ body {
     }
 
     &:first-child {
-      border-radius: 0.5em 0 0 0.5em;
+      border-top-left-radius: 0.5em;
+      border-bottom-left-radius: 0.5em;
     }
 
     &:last-child {
-      border-radius: 0 0.5em 0.5em 0;
+      border-top-right-radius: 0.5em;
+      border-bottom-right-radius: 0.5em;
     }
 
     &:only-child {
       border-radius: 0.5em;
     }
   }
-}
-
-.no-wrap {
-  white-space: nowrap;
-}
-
-.no-underline {
-  text-decoration: none;
-  color: #333;
-}
-
-.max-width-40em {
-  max-width: 20em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }

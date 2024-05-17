@@ -31,18 +31,22 @@ data.forEach((bill) => {
     }
   });
 });
+
+const calcWidth = (daysSinceLastEvent) => {
+  return Math.min(1, Math.max(90, (daysSinceLastEvent / 90) * 90));
+};
 ---
 
 <Layout title="Bill Tracker">
   <div>
     {
-      data.map((bill, index) => (
+      data.map((bill) => (
         <div class={`bill event-count-${bill.events.length}`}>
           {bill.events.map((event, index) => (
             <a
               href={`https://pmg.org.za/bill/${bill.id}/`}
               target="_blank"
-              style={{ width: `${event.daysSinceLastEvent}px` }}
+              style={{ width: `${calcWidth(event.daysSinceLastEvent)}vw` }}
               title={`(${event.house}) ${event.title}: ${event.date}`}
               class={`event event-house-${event.house} ${bill.events[index - 1]?.house != event.house ? "previous-not-same-house" : ""} ${bill.events[index + 1]?.house != event.house ? "next-not-same-house" : ""}`}
             />
