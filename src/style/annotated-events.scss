@@ -39,7 +39,7 @@ li {
       position: sticky;
       top: 0;
       background-color: #f0f0f0;
-      
+
       line-height: 1.25em;
       a {
         color: #333;
@@ -61,6 +61,27 @@ li {
       .member {
         color: #999;
         text-decoration: none;
+        font-size: 0.8em;
+        line-height: 1.25em;
+
+        .label {
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 10em;
+          margin: 0 auto;
+        }
+
+        .party {
+          font-weight: bold;
+        }
+
+        .chairperson {
+          text-transform: uppercase;
+          font-size: smaller;
+          font-style: italic;
+        }
 
         .party-circle {
           margin: 0 auto;

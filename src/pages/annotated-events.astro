@@ -84,8 +84,12 @@ filteredData.forEach((event) => {
                       }}
                     />
                   </div>
-                  {member.name} ({member.party}){" "}
-                  {member.chairperson ? "(Chairperson)" : ""}
+                  <label class="label">
+                    <span class="name">{member.name}</span>
+                    <br />
+                    <span class="party">{member.party}</span>
+                    {member.chairperson ? (<span class="chairperson">Chairperson</span>) : ""}</span>
+                  </label>
                 </a>
               </li>
             ))}
