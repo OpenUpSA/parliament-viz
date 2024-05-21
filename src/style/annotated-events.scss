@@ -1,0 +1,71 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family: Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+  box-sizing: border-box;
+}
+
+body {
+  padding: 1em 2em;
+  line-height: 1.5em;
+}
+
+ul,
+li {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 0 1em 0;
+}
+
+.committee-meeting {
+  .attendance {
+    float: right;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    max-width: 40em;
+    vertical-align: middle;
+
+    li {
+      display: inline-block;
+      padding: 1em;
+      .member {
+        color: #999;
+        text-decoration: none;
+
+        .party-circle {
+          margin: 0 auto;
+          border-radius: 100%;
+          vertical-align: middle;
+          overflow: hidden;
+          align-items: center;
+          justify-content: center;
+          display: flex;
+
+          .avatar {
+            display: block;
+            cursor: pointer;
+            border-radius: 100%;
+            height: 50%;
+            width: 50%;
+            min-height: 40px;
+            min-width: 40px;
+            background-size: cover;
+            background-position: top center;
+            background-repeat: no-repeat;
+          }
+        }
+      }
+    }
+  }
+
+  .annotated-body {
+    max-width: 40em;
+  }
+}

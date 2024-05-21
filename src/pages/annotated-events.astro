@@ -1,0 +1,96 @@
+---
+import Layout from "../layouts/Layout.astro";
+import data from "../data/utterances-by-event-by-member.json";
+import "../style/annotated-events.scss";
+
+const maxUtteranceCount = 32;
+const partyColourOpacity = 0.2;
+const partyColoursRGB = {
+  ANC: `255, 203, 3`,
+  DA: `0, 92, 167`,
+  EFF: `217, 0, 0`,
+  IFP: `255, 155, 155`,
+  ACDP: `155, 155, 155`,
+  NFP: `0, 255, 255`,
+  UDM: `155, 255, 155`,
+  COPE: `255, 0, 255`,
+  "FF+": `0, 255, 0`,
+  "AGANG SA": `255, 155, 0`,
+  AIC: `255, 155, 255`,
+  APC: `155, 255, 255`,
+  "Al Jama-ah": `255, 255, 155`,
+  ATM: `255, 255, 155`,
+  GOOD: `155, 255, 255`,
+  PAC: `255, 155, 255`,
+  "Minority Front (MF)": `255, 255, 155`,
+};
+
+const partyColourRGBA = (rgb: string) => {
+  return `rgba(${rgb}, ${partyColourOpacity})`;
+};
+
+// Function to scale utterance count between 1 and 50
+const calcVH = (utteranceCount: number) => {
+  const x = 4 + ((utteranceCount - 1) / (maxUtteranceCount - 1)) * (30 - 2);
+  return Math.round(x * 100) / 100;
+};
+
+// Filter out events with empty body
+let filteredData = data.filter((event) => event["annotated_body"].length > 0);
+
+// Sort event attendance by length of utterances
+filteredData.forEach((event) => {
+  event["attendance"].sort((a, b) => {
+    return b["utterances"].length - a["utterances"].length;
+  });
+});
+---
+
+<Layout title="Voices of the 6th Parliament">
+  {
+    filteredData.map((event) => (
+      <div class="committee-meeting">
+        <h1>
+          <a
+            href={`https://pmg.org.za/committee-meeting/${event.id}`}
+            target="_blank"
+          >
+            {event["title"]}
+          </a>
+        </h1>
+        <div class="attendance">
+          <ul>
+            {event["attendance"].map((member) => (
+              <li>
+                <a class="member" href={member["pa_url"]} target="_blank">
+                  <div
+                    class="party-circle"
+                    style={{
+                      width: calcVH(member["utterances"].length) + "vh",
+                      height: calcVH(member["utterances"].length) + "vh",
+                      lineHeight: calcVH(member["utterances"].length) + "vh",
+                      backgroundColor: partyColourRGBA(
+                        partyColoursRGB[member["party"]]
+                      ),
+                    }}
+                  >
+                    <div
+                      class={`avatar`}
+                      style={{
+                        backgroundImage: `url(https://static.pmg.org.za/${member["profile_pic_url"]})`,
+                      }}
+                    />
+                  </div>
+                  {member.name} ({member.party}){" "}
+                  {member.chairperson ? "(Chairperson)" : ""}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="annotated-body" set:html={event["annotated_body"]} />
+        <hr />
+      </div>
+    ))
+  }
+</Layout>
