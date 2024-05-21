@@ -24,13 +24,36 @@ li {
 }
 
 .committee-meeting {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: solid 2px #999;
+  margin-bottom: 1em;
+  padding-top: 1em;
+  max-width: 80em;
+  margin: 0 auto;
+
+  article {
+    .title {
+      padding: 1em 0;
+      margin: 0;
+      position: sticky;
+      top: 0;
+      background-color: #f0f0f0;
+      
+      line-height: 1.25em;
+      a {
+        color: #333;
+        text-decoration: none;
+      }
+    }
+  }
+
   .attendance {
-    float: right;
     text-align: center;
-    position: sticky;
-    top: 0;
-    max-width: 40em;
-    vertical-align: middle;
+    ul {
+      position: sticky;
+      top: 0;
+    }
 
     li {
       display: inline-block;
@@ -63,9 +86,5 @@ li {
         }
       }
     }
-  }
-
-  .annotated-body {
-    max-width: 40em;
   }
 }

@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import data from "../data/utterances-by-event-by-member.json";
 import "../style/annotated-events.scss";
 
-const maxUtteranceCount = 32;
+const maxUtteranceCount = 100;
 const partyColourOpacity = 0.2;
 const partyColoursRGB = {
   ANC: `255, 203, 3`,
@@ -50,14 +50,17 @@ filteredData.forEach((event) => {
   {
     filteredData.map((event) => (
       <div class="committee-meeting">
-        <h1>
-          <a
-            href={`https://pmg.org.za/committee-meeting/${event.id}`}
-            target="_blank"
-          >
-            {event["title"]}
-          </a>
-        </h1>
+        <article>
+          <h1 class="title">
+            <a
+              href={`https://pmg.org.za/committee-meeting/${event.id}`}
+              target="_blank"
+            >
+              {event["title"]}
+            </a>
+          </h1>
+          <div class="annotated-body" set:html={event["annotated_body"]} />
+        </article>
         <div class="attendance">
           <ul>
             {event["attendance"].map((member) => (
@@ -88,8 +91,6 @@ filteredData.forEach((event) => {
             ))}
           </ul>
         </div>
-        <div class="annotated-body" set:html={event["annotated_body"]} />
-        <hr />
       </div>
     ))
   }
